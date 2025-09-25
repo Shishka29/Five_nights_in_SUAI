@@ -1,0 +1,4 @@
+repository "5 nigths in SUAI/5 nigths in SUAI@10171337944735@cloud"
+  path "/"
+    br "/main"
+    co "/main"
