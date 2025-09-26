@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class herosqript : MonoBehaviour
 {
-    public float sensitivy = 150f;
+    public tabcontroller tabletController;
+    public float sensitivy = 375f;
     float rotateZone = Screen.width / 5;
 
     void Update()
     {
+        if (tabletController != null && tabletController.minimap.activeSelf)
+        {
+            // ѕланшет открыт Ч не вращаем голову
+            return;
+        }
+
         if (Input.mousePosition.x < rotateZone && transform.rotation.eulerAngles.y > 45)
         {
             transform.Rotate(0, -sensitivy * Time.deltaTime, 0);
