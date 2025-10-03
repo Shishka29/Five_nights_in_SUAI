@@ -131,16 +131,16 @@ MonoBehaviour:
   active: 1
   type:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 10
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.3
   response:
     m_OverrideState: 1
     m_Value: 0.8
   texture:
     m_OverrideState: 1
-    m_Value: {fileID: 0}
+    m_Value: {fileID: 2800000, guid: b238878e5911b994abbcf9516b62fd81, type: 3}
 --- !u!114 &-476862856471970273
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
-  m_Name: SampleSceneProfile
+  m_Name: VHS 2
   m_EditorClassIdentifier: 
   components:
   - {fileID: -7893295128165547882}
