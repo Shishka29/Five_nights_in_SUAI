@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Of
   m_EditorClassIdentifier: 
   roomName: Oficce
-  connectedRooms: []
+  connectedRooms:
+  - {fileID: 11400000, guid: d05ebdfc176e6164295b877a48925288, type: 2}
   cameraIndex: 0
-  mapPosition: {x: 0, y: 0}
+  mapPosition: {x: 0, y: 0, z: 0}
+  stageLevel: 5

@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2edafd19a6eee7a428bd8e7ba0c28721, type: 3}
   m_Name: 4
   m_EditorClassIdentifier: 
-  roomName: 
-  connectedRooms: []
-  mapPosition: {x: 0, y: 0, z: 0}
+  roomName: 4
+  connectedRooms:
+  - {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}
+  - {fileID: 11400000, guid: cd5579d26302a484ab1d7d335f5aa876, type: 2}
+  cameraIndex: 0
+  mapPosition: {x: 6.82, y: 0, z: -22.55}
+  stageLevel: 3
