@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d8d4ace13bf95498d70d3f8fe99bce, type: 3}
+  m_Name: bonniepath
+  m_EditorClassIdentifier: 
+  animatronicName: Bonnie
+  targetRoom: {fileID: 11400000, guid: 4bf22f1bd616b9646aa0d2806367b2cb, type: 2}
+  pathColor: {r: 0.10924374, g: 0.015686274, b: 1, a: 1}
+  pathSegments:
+  - from: {fileID: 11400000, guid: 1c4a71047b4bfcf479546f07a9a0da4e, type: 2}
+    to: {fileID: 11400000, guid: d05ebdfc176e6164295b877a48925288, type: 2}
+  - from: {fileID: 11400000, guid: d05ebdfc176e6164295b877a48925288, type: 2}
+    to: {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}
+  - from: {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}
+    to: {fileID: 11400000, guid: 39257b971d807464e958ba69d1c2887d, type: 2}
+  - from: {fileID: 11400000, guid: 39257b971d807464e958ba69d1c2887d, type: 2}
+    to: {fileID: 11400000, guid: 2ffd3d60322260c4399a131e296b28c0, type: 2}
+  - from: {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}
+    to: {fileID: 11400000, guid: cd5579d26302a484ab1d7d335f5aa876, type: 2}
+  - from: {fileID: 11400000, guid: cd5579d26302a484ab1d7d335f5aa876, type: 2}
+    to: {fileID: 11400000, guid: dca6f3dbbea52b44b8e32edf0e873bc0, type: 2}
+  - from: {fileID: 11400000, guid: cd5579d26302a484ab1d7d335f5aa876, type: 2}
+    to: {fileID: 11400000, guid: 54e9e2c5d3167e4429657bb02bd599df, type: 2}
+  - from: {fileID: 11400000, guid: 54e9e2c5d3167e4429657bb02bd599df, type: 2}
+    to: {fileID: 11400000, guid: 4bf22f1bd616b9646aa0d2806367b2cb, type: 2}
+  - from: {fileID: 11400000, guid: 2ffd3d60322260c4399a131e296b28c0, type: 2}
+    to: {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}

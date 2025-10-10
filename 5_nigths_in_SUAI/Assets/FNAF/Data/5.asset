@@ -15,8 +15,9 @@ MonoBehaviour:
   roomName: 5
   connectedRooms:
   - {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}
-  - {fileID: 11400000, guid: 39257b971d807464e958ba69d1c2887d, type: 2}
-  - {fileID: 11400000, guid: 4bf22f1bd616b9646aa0d2806367b2cb, type: 2}
-  cameraIndex: 0
-  mapPosition: {x: -5, y: 0, z: -21.02}
+  - {fileID: 11400000, guid: 54e9e2c5d3167e4429657bb02bd599df, type: 2}
+  - {fileID: 11400000, guid: dca6f3dbbea52b44b8e32edf0e873bc0, type: 2}
+  linkedCamera: {fileID: 0}
+  cameraIndex: 3
+  mapPosition: {x: 2.57, y: 0, z: 14.27}
   stageLevel: 4

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2edafd19a6eee7a428bd8e7ba0c28721, type: 3}
+  m_Name: 6
+  m_EditorClassIdentifier: 
+  roomName: 6
+  connectedRooms:
+  - {fileID: 11400000, guid: cd5579d26302a484ab1d7d335f5aa876, type: 2}
+  linkedCamera: {fileID: 0}
+  cameraIndex: 5
+  mapPosition: {x: -2.2, y: 0, z: 11.19}
+  stageLevel: 4

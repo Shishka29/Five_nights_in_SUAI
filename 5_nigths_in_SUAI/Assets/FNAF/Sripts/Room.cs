@@ -1,14 +1,20 @@
-using UnityEngine;
+п»їusing UnityEngine;
 
 [CreateAssetMenu(fileName = "Room", menuName = "FNAF/Room")]
 public class Room : ScriptableObject
 {
+
     [Header("Room Info")]
-    public string roomName; // Название комнаты (Stage, Office и т.д.)
-    public Room[] connectedRooms; // Связанные комнаты
-    public int cameraIndex; // Индекс камеры (если нужно)
+    public string roomName;
+    public Room[] connectedRooms;
+
+    [Tooltip("РћР±СЉРµРєС‚ РєР°РјРµСЂС‹, РєРѕС‚РѕСЂР°СЏ РїРѕРєР°Р·С‹РІР°РµС‚ СЌС‚Сѓ РєРѕРјРЅР°С‚Сѓ (РµСЃР»Рё РµСЃС‚СЊ)")]
+    public Camera linkedCamera;
+
+    [Tooltip("РРЅРґРµРєСЃ РєР°РјРµСЂС‹ (РґР»СЏ РёРЅС‚РµСЂС„РµР№СЃР° РёР»Рё РїРµСЂРµРєР»СЋС‡РµРЅРёСЏ)")]
+    public int cameraIndex;
 
     [Header("Map Settings")]
-    public Vector3 mapPosition; // Позиция на карте (для моделей, UI)
-    public int stageLevel; // <-- ВАЖНО: уровень комнаты (насколько близко к офису)
+    public Vector3 mapPosition;
+    public int stageLevel;
 }

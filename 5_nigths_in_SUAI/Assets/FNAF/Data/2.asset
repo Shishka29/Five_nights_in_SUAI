@@ -14,8 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomName: 2
   connectedRooms:
+  - {fileID: 11400000, guid: 5e3668e7d78533740a1d52f84bc56b8e, type: 2}
+  - {fileID: 11400000, guid: 1c4a71047b4bfcf479546f07a9a0da4e, type: 2}
   - {fileID: 11400000, guid: 798668e03e4d97b479f4390fc84f1abf, type: 2}
   - {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}
-  cameraIndex: 0
-  mapPosition: {x: -2.1, y: 0, z: -27.84}
+  - {fileID: 11400000, guid: 201143358734474429bb1b9d5818c146, type: 2}
+  - {fileID: 11400000, guid: 4d1a562b921bdac4ca1b6eb41f65b7ba, type: 2}
+  - {fileID: 11400000, guid: c1145a7ebca6acf4fb24b8dc78db6d51, type: 2}
+  linkedCamera: {fileID: 0}
+  cameraIndex: 1
+  mapPosition: {x: -6.9, y: 0, z: 18.7}
   stageLevel: 2

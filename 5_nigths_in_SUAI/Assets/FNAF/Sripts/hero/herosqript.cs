@@ -16,11 +16,11 @@ public class herosqript : MonoBehaviour
             return;
         }
 
-        if (Input.mousePosition.x < rotateZone && transform.rotation.eulerAngles.y > 45)
+        if (Input.mousePosition.x < rotateZone && transform.rotation.eulerAngles.y > 135)
         {
             transform.Rotate(0, -sensitivy * Time.deltaTime, 0);
         }
-        if (Input.mousePosition.x > Screen.width - rotateZone && transform.rotation.eulerAngles.y < 135)
+        if (Input.mousePosition.x > Screen.width - rotateZone && transform.rotation.eulerAngles.y < 225)
         {
             transform.Rotate(0, sensitivy * Time.deltaTime, 0);
         }

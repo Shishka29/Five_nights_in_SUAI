@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d8d4ace13bf95498d70d3f8fe99bce, type: 3}
+  m_Name: freddypath
+  m_EditorClassIdentifier: 
+  animatronicName: Freddy
+  targetRoom: {fileID: 11400000, guid: 4bf22f1bd616b9646aa0d2806367b2cb, type: 2}
+  pathColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  pathSegments:
+  - from: {fileID: 11400000, guid: 798668e03e4d97b479f4390fc84f1abf, type: 2}
+    to: {fileID: 11400000, guid: d05ebdfc176e6164295b877a48925288, type: 2}
+  - from: {fileID: 11400000, guid: d05ebdfc176e6164295b877a48925288, type: 2}
+    to: {fileID: 11400000, guid: 201143358734474429bb1b9d5818c146, type: 2}
+  - from: {fileID: 11400000, guid: d05ebdfc176e6164295b877a48925288, type: 2}
+    to: {fileID: 11400000, guid: 4d1a562b921bdac4ca1b6eb41f65b7ba, type: 2}
+  - from: {fileID: 11400000, guid: d05ebdfc176e6164295b877a48925288, type: 2}
+    to: {fileID: 11400000, guid: c1145a7ebca6acf4fb24b8dc78db6d51, type: 2}
+  - from: {fileID: 11400000, guid: c1145a7ebca6acf4fb24b8dc78db6d51, type: 2}
+    to: {fileID: 11400000, guid: c9ddf53bef0907c4382b55e57ae33762, type: 2}
+  - from: {fileID: 11400000, guid: c9ddf53bef0907c4382b55e57ae33762, type: 2}
+    to: {fileID: 11400000, guid: f88c201e93293d4479d077ce456c9d68, type: 2}
+  - from: {fileID: 11400000, guid: f88c201e93293d4479d077ce456c9d68, type: 2}
+    to: {fileID: 11400000, guid: 4bf22f1bd616b9646aa0d2806367b2cb, type: 2}
