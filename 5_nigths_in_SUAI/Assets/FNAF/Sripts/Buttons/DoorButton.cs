@@ -2,24 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LightButton : MonoBehaviour
+public class DoorButton : MonoBehaviour
 {
-    public GameObject doorLight;
     Vector3 position;
+    public Door door;
     void Awake()
     {
         position = transform.localPosition;
-        doorLight.SetActive(false);
     }
-    
-    void OnMouseDown()
+
+    private void OnMouseDown()
     {
         transform.localPosition = position - transform.forward * 0.03f;
-        doorLight.SetActive(true);
+        door.ButtonPressed();
+        Invoke("MouseUp", 0.1f);
     }
-    void OnMouseUp()
+
+    void MouseUp()
     {
         transform.localPosition = position;
-        doorLight.SetActive(false);
     }
 }
