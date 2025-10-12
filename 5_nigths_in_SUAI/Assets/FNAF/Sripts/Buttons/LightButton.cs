@@ -13,7 +13,7 @@ public class LightButton : MonoBehaviour
     
     void OnMouseDown()
     {
-        transform.localPosition = position - transform.forward * -0.03f;
+        transform.localPosition = position - transform.forward * 0.03f;
         doorLight.SetActive(true);
     }
     void OnMouseUp()
