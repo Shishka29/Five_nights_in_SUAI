@@ -5,14 +5,16 @@ using UnityEngine;
 
 public class AnimatronicAI : MonoBehaviour
 {
+    [Header("Стартовая сложность")]
+    [Range(1, 20)] public int startDifficulty = 10;
+
     [Header("References")]
     public Transform animatronicModel;
     public AnimatronicPathData pathData;
 
     [Header("AI Settings")]
     public Room currentRoom;
-    public Room targetRoom;       // Офис
-    [Range(1f, 20f)] public int difficulty = 10;
+    public Room targetRoom; // офис
 
     [Header("Door Settings")]
     public Door officeDoor;
@@ -25,6 +27,11 @@ public class AnimatronicAI : MonoBehaviour
 
     [Header("Debug")]
     public bool showDebugLogs = true;
+
+    // 🔹 новые поля для управления из NightManager
+    [Header("Control")]
+    public bool CanMove = false;
+    public int difficulty; // текущая сложность
 
     private Room lastRoom;
     private float timer;
@@ -62,15 +69,19 @@ public class AnimatronicAI : MonoBehaviour
 
         if (currentRoom != null)
             MoveModelToRoom(currentRoom);
+
+        difficulty = startDifficulty;
+
+        if (showDebugLogs)
+            Debug.Log($"{name}: ждёт разрешения на движение...");
     }
 
     void Update()
     {
-        if (isRecovering) return;
+        if (!CanMove || isRecovering) return;
 
         timer += Time.deltaTime;
 
-        // 🔹 Ограничиваем минимальную задержку шага до 4 секунд
         float minInterval = 4f;
         float maxInterval = 8f;
         float adjustedInterval = Mathf.Lerp(maxInterval, minInterval, difficulty / 20f);
@@ -95,6 +106,16 @@ public class AnimatronicAI : MonoBehaviour
 
         UpdateChancesByDifficulty();
         MoveToNextRoom();
+    }
+
+    public void ActivateAI()
+    {
+        CanMove = true;
+        difficulty = startDifficulty;
+        timer = 0f;
+
+        if (showDebugLogs)
+            Debug.Log($"{name} активирован! Стартовая сложность = {difficulty}");
     }
 
     void UpdateChancesByDifficulty()
@@ -124,13 +145,12 @@ public class AnimatronicAI : MonoBehaviour
 
         lastRoom = currentRoom;
 
-        // 🚫 Если следующая комната — офис и дверь закрыта, остаёмся и запускаем Recover
         if (nextRoom == targetRoom && officeDoor != null && !officeDoor.isOpen)
         {
             if (showDebugLogs)
                 Debug.Log($"{name} врезался в закрытую дверь офиса! Возвращается на старт.");
             StartCoroutine(Recover());
-            return; // Модель не перемещается в офис
+            return;
         }
 
         currentRoom = nextRoom;
@@ -140,16 +160,13 @@ public class AnimatronicAI : MonoBehaviour
             Debug.Log($"{name} перешёл из {lastRoom.roomName} → {currentRoom.roomName}");
 
         if (currentRoom == targetRoom)
-        {
-            Debug.Log($"⚠️ {name} достиг офиса!");
-            GameManager.Instance?.TriggerGameOver(name);
-        }
+            NightManager.Instance.TriggerGameOver(name);
     }
 
     IEnumerator Recover()
     {
         isRecovering = true;
-        yield return new WaitForSeconds(2f); // пауза после столкновения
+        yield return new WaitForSeconds(2f);
 
         if (startRoom != null)
         {
