@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI; // 🟢 добавляем, чтобы работать с Image
 
 public class tabcontroller : MonoBehaviour
 {
@@ -47,6 +48,15 @@ public class tabcontroller : MonoBehaviour
     public AudioClip soundLightsTab;    // жужжание света (loop)
 
     private bool lightLoopPlaying = false;
+
+    // 🟢 Добавляем секцию для спрайтов
+    [Header("Camera Sprites")]
+    public Image cameraDisplay;         // UI-элемент, где будет показан спрайт
+    public Sprite[] cameraSprites;      // спрайты для каждой камеры (по индексу)
+
+    [Header("Room Sprites")]
+    public Image roomDisplay;         
+    public Sprite[] roomSprites;      
 
     void Awake()
     {
@@ -141,6 +151,10 @@ public class tabcontroller : MonoBehaviour
         }
 
         camerasActive = true;
+
+        // 🟢 Устанавливаем спрайт текущей камеры при открытии планшета
+        UpdateCameraSprite(currentCameraIndex);
+        UpdateRoomSprite(currentCameraIndex);
     }
 
     void Close()
@@ -185,7 +199,30 @@ public class tabcontroller : MonoBehaviour
 
         cameras[currentCameraIndex].SetActive(true);
         TurnOffLights(currentCameraIndex);
+
+        // 🟢 Меняем спрайт на новый
+        UpdateCameraSprite(currentCameraIndex);
+        UpdateRoomSprite(currentCameraIndex);
     }
+
+    // 🟢 Функция обновления спрайта
+    void UpdateCameraSprite(int index)
+    {
+        if (cameraDisplay != null && cameraSprites != null && index < cameraSprites.Length && cameraSprites[index] != null)
+        {
+            cameraDisplay.sprite = cameraSprites[index];
+        }
+    }
+
+    // 🟢 Функция обновления спрайта комнаты
+    void UpdateRoomSprite(int index)
+    {
+        if (roomDisplay != null && roomSprites != null && index < roomSprites.Length && roomSprites[index] != null)
+        {
+            roomDisplay.sprite = roomSprites[index];
+        }
+    }
+
 
     void TurnOffLights(int cameraIndex)
     {

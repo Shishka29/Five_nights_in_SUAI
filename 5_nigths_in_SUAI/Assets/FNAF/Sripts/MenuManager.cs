@@ -6,6 +6,7 @@ using System.Collections;
 public class MenuManager : MonoBehaviour
 {
     [Header("Menu UI")]
+    public Canvas mainMenuCanvas;       // 🎨 основной канвас меню
     public Image menuImage;
     public Sprite[] menuSprites;
 
@@ -14,6 +15,9 @@ public class MenuManager : MonoBehaviour
     public Button continueButton;
     public Button gachiButton;
     public Button customNightButton;
+
+    [Header("Custom Night")]
+    public Canvas customNightCanvas;    // 🎨 канвас кастом найта
 
     [Header("Intro")]
     public GameObject introPanel;
@@ -26,13 +30,17 @@ public class MenuManager : MonoBehaviour
     public float fadeDuration = 1f;
 
     [Header("Music")]
-    public AudioSource menuMusic;          // 🎵 источник фоновой музыки
-    public float musicFadeDuration = 2f;   // ⏳ длительность плавного затухания
+    public AudioSource menuMusic;
+    public float musicFadeDuration = 2f;
 
     private void Start()
     {
         if (ProgressManager.Instance != null)
             ProgressManager.Instance.LoadProgress();
+
+        // Убедимся, что канвасы в нужном состоянии
+        if (mainMenuCanvas != null) mainMenuCanvas.enabled = true;
+        if (customNightCanvas != null) customNightCanvas.enabled = false;
 
         StartCoroutine(InitMenuNextFrame());
     }
@@ -63,12 +71,10 @@ public class MenuManager : MonoBehaviour
         menuImage.sprite = menuSprites[spriteIndex];
         menuImage.gameObject.SetActive(true);
 
-        Debug.Log($"🖼 Отображается спрайт меню #{spriteIndex} (пройдено ночей: {completedNight})");
-
         SafeSetActiveButton(newGameButton, true);
         SafeSetActiveButton(continueButton, completedNight >= 1);
         SafeSetActiveButton(gachiButton, completedNight >= 1);
-        SafeSetActiveButton(customNightButton, completedNight >= 5);
+        SafeSetActiveButton(customNightButton, completedNight >= 1);
     }
 
     private void SafeSetActiveButton(Button button, bool state)
@@ -80,8 +86,6 @@ public class MenuManager : MonoBehaviour
     // --- Кнопки ---
     public void StartNewGame()
     {
-        Debug.Log("▶️ Начинаем новую игру");
-
         if (ProgressManager.Instance != null)
         {
             ProgressManager.Instance.completedNight = 1;
@@ -100,13 +104,8 @@ public class MenuManager : MonoBehaviour
 
         if (nextNight <= 6)
         {
-            Debug.Log($"⏩ Продолжаем с ночи {nextNight}");
             HideMenuUI();
             StartCoroutine(FadeAndLoad($"Night{nextNight}", showIntro: false));
-        }
-        else
-        {
-            Debug.LogWarning("Нет доступных ночей для продолжения!");
         }
     }
 
@@ -118,8 +117,31 @@ public class MenuManager : MonoBehaviour
 
     public void OpenCustomNight()
     {
-        HideMenuUI();
-        StartCoroutine(FadeAndLoad("CustomNight", showIntro: false));
+        Debug.Log("⚙️ Открыт режим Custom Night");
+
+        // Отключаем основной канвас и включаем кастом найт
+        if (mainMenuCanvas != null)
+            mainMenuCanvas.enabled = false;
+
+        if (customNightCanvas != null)
+            customNightCanvas.enabled = true;
+
+        // Можно добавить лёгкий fade-переход
+        if (fadePanel != null)
+        {
+            StartCoroutine(SimpleFade(fadePanel, 0.25f));
+        }
+    }
+
+    public void ReturnFromCustomNight()
+    {
+        Debug.Log("↩️ Возврат в основное меню");
+
+        if (customNightCanvas != null)
+            customNightCanvas.enabled = false;
+
+        if (mainMenuCanvas != null)
+            mainMenuCanvas.enabled = true;
     }
 
     // --- UI Скрытие / Переход ---
@@ -136,11 +158,9 @@ public class MenuManager : MonoBehaviour
 
     private IEnumerator FadeAndLoad(string sceneName, bool showIntro)
     {
-        // 🎵 Плавное затухание музыки
         if (menuMusic != null)
             StartCoroutine(FadeOutMusic());
 
-        // --- Затемнение ---
         if (fadePanel != null)
         {
             fadePanel.SetActive(true);
@@ -158,7 +178,6 @@ public class MenuManager : MonoBehaviour
             }
         }
 
-        // --- Интро ---
         if (showIntro && introPanel != null && introImage != null && newGameIntroSprite != null)
         {
             introImage.sprite = newGameIntroSprite;
@@ -173,10 +192,8 @@ public class MenuManager : MonoBehaviour
             yield break;
         }
 
-        Debug.Log($"🎬 Загружаем сцену: {sceneName}");
         AsyncOperation asyncOp = SceneManager.LoadSceneAsync(sceneName);
         asyncOp.allowSceneActivation = true;
-
         while (!asyncOp.isDone)
             yield return null;
     }
@@ -194,7 +211,36 @@ public class MenuManager : MonoBehaviour
         }
 
         menuMusic.Stop();
-        menuMusic.volume = startVolume; // возвращаем громкость для следующего запуска
+        menuMusic.volume = startVolume;
+    }
+
+    private IEnumerator SimpleFade(GameObject panel, float duration)
+    {
+        CanvasGroup cg = panel.GetComponent<CanvasGroup>();
+        if (cg == null) yield break;
+
+        panel.SetActive(true);
+        cg.alpha = 0f;
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            cg.alpha = Mathf.Lerp(0f, 1f, t);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.05f);
+
+        t = 0f;
+        while (t < 1f)
+        {
+            t += Time.deltaTime / duration;
+            cg.alpha = Mathf.Lerp(1f, 0f, t);
+            yield return null;
+        }
+
+        panel.SetActive(false);
     }
 
     private bool SceneExists(string sceneName)
