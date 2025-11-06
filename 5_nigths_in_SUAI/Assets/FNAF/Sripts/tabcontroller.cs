@@ -27,7 +27,7 @@ public class tabcontroller : MonoBehaviour
         public float[] maxIntensities;
     }
 
-    [Header("Camera Lights")] // <-- Header только над полем
+    [Header("Camera Lights")]
     public CameraLightGroup[] cameraLights;
 
     [Tooltip("Скорость плавного включения/выключения света")]
@@ -35,6 +35,18 @@ public class tabcontroller : MonoBehaviour
 
     private bool camerasActive = false;
     public bool CamerasActive => camerasActive;
+
+    [Header("Audio Sources")]
+    public AudioSource audioSource;     // источник для планшета и переключений
+    public AudioSource lightAudio;      // отдельный источник для звука света
+
+    [Header("Sounds")]
+    public AudioClip soundMain;         // звук открытия/закрытия
+    public AudioClip soundLoop;         // фоновый при открытии
+    public AudioClip soundTap;          // звук при переключении камеры
+    public AudioClip soundLightsTab;    // жужжание света (loop)
+
+    private bool lightLoopPlaying = false;
 
     void Awake()
     {
@@ -63,7 +75,27 @@ public class tabcontroller : MonoBehaviour
         if (group.lights == null) return;
 
         bool mouseOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+        bool isPressed = Input.GetMouseButton(0) && !mouseOverUI;
 
+        // 🎧 звук включения света при зажатии
+        if (isPressed && !lightLoopPlaying)
+        {
+            if (lightAudio && soundLightsTab)
+            {
+                lightAudio.clip = soundLightsTab;
+                lightAudio.loop = true;
+                lightAudio.Play();
+                lightLoopPlaying = true;
+            }
+        }
+        else if (!isPressed && lightLoopPlaying)
+        {
+            if (lightAudio && lightAudio.isPlaying)
+                lightAudio.Stop();
+            lightLoopPlaying = false;
+        }
+
+        // управление яркостью ламп
         for (int i = 0; i < group.lights.Length; i++)
         {
             var light = group.lights[i];
@@ -73,7 +105,7 @@ public class tabcontroller : MonoBehaviour
                 ? group.maxIntensities[i]
                 : 3f;
 
-            float target = (Input.GetMouseButton(0) && !mouseOverUI) ? max : 0f;
+            float target = isPressed ? max : 0f;
             light.intensity = Mathf.Lerp(light.intensity, target, Time.deltaTime * lightFadeSpeed);
         }
     }
@@ -88,6 +120,9 @@ public class tabcontroller : MonoBehaviour
 
     IEnumerator Open()
     {
+        // звук открытия
+        if (audioSource && soundMain)
+            audioSource.PlayOneShot(soundMain);
         if (anim != null) anim.SetBool("isOpen", true);
         yield return new WaitForSeconds(0.4f);
 
@@ -97,11 +132,32 @@ public class tabcontroller : MonoBehaviour
         if (cameras != null && cameras.Length > 0)
             cameras[currentCameraIndex].SetActive(true);
 
+        // фоновый звук планшета
+        if (audioSource && soundLoop)
+        {
+            audioSource.clip = soundLoop;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
+
         camerasActive = true;
     }
 
     void Close()
     {
+        // выключаем фоновый звук планшета
+        if (audioSource && audioSource.clip == soundLoop)
+            audioSource.Stop();
+
+        // выключаем световой звук, если держали
+        if (lightAudio && lightAudio.isPlaying)
+            lightAudio.Stop();
+        lightLoopPlaying = false;
+
+        // звук закрытия
+        if (audioSource && soundMain)
+            audioSource.PlayOneShot(soundMain);
+
         if (cameras != null && cameras.Length > 0)
             cameras[currentCameraIndex].SetActive(false);
 
@@ -116,6 +172,10 @@ public class tabcontroller : MonoBehaviour
 
     public void ChangeCamera(int index)
     {
+        // звук смены камеры
+        if (audioSource && soundTap)
+            audioSource.PlayOneShot(soundTap);
+
         if (cameras == null || index < 0 || index >= cameras.Length) return;
 
         cameras[currentCameraIndex].SetActive(false);
