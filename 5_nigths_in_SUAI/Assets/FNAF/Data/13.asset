@@ -10,14 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2edafd19a6eee7a428bd8e7ba0c28721, type: 3}
-  m_Name: 5
+  m_Name: 13
   m_EditorClassIdentifier: 
-  roomName: 5
+  roomName: 13
   connectedRooms:
-  - {fileID: 11400000, guid: 93ccbf424be8ded4fa44247cba5652b0, type: 2}
   - {fileID: 11400000, guid: 54e9e2c5d3167e4429657bb02bd599df, type: 2}
-  - {fileID: 11400000, guid: dca6f3dbbea52b44b8e32edf0e873bc0, type: 2}
+  - {fileID: 11400000, guid: 4bf22f1bd616b9646aa0d2806367b2cb, type: 2}
   linkedCamera: {fileID: 0}
-  cameraIndex: 3
-  mapPosition: {x: -2.66, y: 0, z: 14.1}
-  stageLevel: 4
+  cameraIndex: 4
+  mapPosition: {x: 8.12, y: 0, z: 14.67}
+  stageLevel: 6

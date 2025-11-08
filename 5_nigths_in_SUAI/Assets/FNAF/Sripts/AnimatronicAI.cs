@@ -20,6 +20,12 @@ public class AnimatronicAI : MonoBehaviour
     public Door officeDoor;
     public Room startRoom;
 
+    [Header("Light Check Rooms (комнаты у дверей)")]
+    public Room leftDoorRoom;    // комната у левой двери
+    public Room rightDoorRoom;   // комната у правой двери
+    public LightButton leftLight;   // ссылка на левый свет
+    public LightButton rightLight;  // ссылка на правый свет
+
     [Header("Movement Chances")]
     [Range(0f, 1f)] public float forwardChance = 0.7f;
     [Range(0f, 1f)] public float sideChance = 0.2f;
@@ -28,10 +34,9 @@ public class AnimatronicAI : MonoBehaviour
     [Header("Debug")]
     public bool showDebugLogs = true;
 
-    // 🔹 новые поля для управления из NightManager
     [Header("Control")]
     public bool CanMove = false;
-    public int difficulty; // текущая сложность
+    public int difficulty;
 
     private Room lastRoom;
     private float timer;
@@ -53,6 +58,7 @@ public class AnimatronicAI : MonoBehaviour
 
     void Start()
     {
+        // Собираем список комнат из pathData
         if (pathData != null && pathData.pathSegments != null)
         {
             var roomSet = new HashSet<Room>();
@@ -80,8 +86,15 @@ public class AnimatronicAI : MonoBehaviour
     {
         if (!CanMove || isRecovering) return;
 
-        timer += Time.deltaTime;
+        // 🚫 Если сейчас свет горит в комнате, где он стоит — замираем
+        if (IsLightAffectingCurrentRoom())
+        {
+            if (showDebugLogs)
+                Debug.Log($"{name}: стоит в {currentRoom.roomName}, свет включён — жду...");
+            return;
+        }
 
+        timer += Time.deltaTime;
         float minInterval = 4f;
         float maxInterval = 8f;
         float adjustedInterval = Mathf.Lerp(maxInterval, minInterval, difficulty / 20f);
@@ -89,20 +102,12 @@ public class AnimatronicAI : MonoBehaviour
         if (timer < adjustedInterval) return;
         timer = 0f;
 
-        if (IsRoomVisible(currentRoom))
-        {
-            if (showDebugLogs)
-                Debug.Log($"{name}: камера смотрит на {currentRoom.roomName}, жду...");
-            return;
-        }
+        // Если камера видит текущую комнату — ждем
+        if (IsRoomVisible(currentRoom)) return;
 
+        // Шанс на пропуск хода
         float chance = Random.Range(0f, 20f);
-        if (chance > difficulty)
-        {
-            if (showDebugLogs)
-                Debug.Log($"{name}: пропускает ход (chance={chance})");
-            return;
-        }
+        if (chance > difficulty) return;
 
         UpdateChancesByDifficulty();
         MoveToNextRoom();
@@ -115,7 +120,7 @@ public class AnimatronicAI : MonoBehaviour
         timer = 0f;
 
         if (showDebugLogs)
-            Debug.Log($"{name} активирован! Стартовая сложность = {difficulty}");
+            Debug.Log($"{name} активирован! Сложность = {difficulty}");
     }
 
     void UpdateChancesByDifficulty()
@@ -133,6 +138,9 @@ public class AnimatronicAI : MonoBehaviour
         connected.RemoveAll(IsRoomOccupied);
         connected.RemoveAll(IsRoomVisible);
 
+        // 🔸 Не идти в комнату, где включен свет
+        connected = connected.Where(r => !IsLightBlocking(r)).ToList();
+
         if (connected.Count == 0)
         {
             if (showDebugLogs)
@@ -145,6 +153,7 @@ public class AnimatronicAI : MonoBehaviour
 
         lastRoom = currentRoom;
 
+        // Проверка двери офиса
         if (nextRoom == targetRoom && officeDoor != null && !officeDoor.isOpen)
         {
             if (showDebugLogs)
@@ -161,6 +170,34 @@ public class AnimatronicAI : MonoBehaviour
 
         if (currentRoom == targetRoom)
             NightManager.Instance.TriggerGameOver(name);
+    }
+
+    // 🔸 Проверка: свет мешает ли входу в комнату
+    bool IsLightBlocking(Room nextRoom)
+    {
+        if (leftLight != null && leftDoorRoom == nextRoom && leftLight.IsLightOn)
+        {
+            if (showDebugLogs)
+                Debug.Log($"{name}: не может подойти к {nextRoom.roomName}, левый свет включён!");
+            return true;
+        }
+        if (rightLight != null && rightDoorRoom == nextRoom && rightLight.IsLightOn)
+        {
+            if (showDebugLogs)
+                Debug.Log($"{name}: не может подойти к {nextRoom.roomName}, правый свет включён!");
+            return true;
+        }
+        return false;
+    }
+
+    // 🔸 Проверка: свет мешает ли текущей комнате
+    bool IsLightAffectingCurrentRoom()
+    {
+        if (leftLight != null && leftDoorRoom == currentRoom && leftLight.IsLightOn)
+            return true;
+        if (rightLight != null && rightDoorRoom == currentRoom && rightLight.IsLightOn)
+            return true;
+        return false;
     }
 
     IEnumerator Recover()

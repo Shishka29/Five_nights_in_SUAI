@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI; // нужно для кнопки и спрайта
 
 [System.Serializable]
 public class DifficultySegment
 {
     [Header("Время и сложность")]
-    public float startTime;      // Когда начинается сегмент
-    public float duration;       // Сколько длится
-    [Range(1, 20)] public int difficulty; // Уровень сложности
+    public float startTime;
+    public float duration;
+    [Range(1, 20)] public int difficulty;
 }
 
 [System.Serializable]
@@ -33,9 +34,9 @@ public class NightManager : MonoBehaviour
     public static NightManager Instance { get; private set; }
 
     [Header("⚙️ Параметры ночи")]
-    public float nightTimer = 0f;           // Сколько прошло времени
-    public float nightLength = 120f;        // Сколько длится ночь
-    public float delayBeforeMenu = 5f;      // Задержка перед главным меню
+    public float nightTimer = 0f;
+    public float nightLength = 120f;
+    public float delayBeforeMenu = 5f;
     public bool showDebugLogs = true;
 
     [Header("🤖 Аниматроники")]
@@ -44,12 +45,17 @@ public class NightManager : MonoBehaviour
     [Header("🦊 Фокси")]
     public List<FoxySettings> foxySettings = new();
 
+    [Header("📞 Телефонный звонок")]
+    [Tooltip("Через сколько секунд после старта ночи включается звонок (например 5–7)")]
+    public float phoneStartDelay = 6f;
+    public AudioSource phoneAudio;       // звук звонка
+    public Image phoneSprite;            // спрайт телефона
+    public Button phoneButton;           // кнопка отключения
+
     private Dictionary<object, int> lastDifficulty = new();
     private bool nightEnded = false;
+    private bool phoneActive = false;
 
-    // ======================
-    // Инициализация
-    // ======================
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -66,7 +72,6 @@ public class NightManager : MonoBehaviour
         nightEnded = false;
         lastDifficulty.Clear();
 
-        // Останавливаем всех
         foreach (var s in animatronicSettings)
         {
             if (s.animatronic != null)
@@ -87,11 +92,60 @@ public class NightManager : MonoBehaviour
 
         if (showDebugLogs)
             Debug.Log("🌙 Ночь началась!");
+
+        // Настройка телефона
+        if (phoneAudio != null) phoneAudio.Stop();
+        if (phoneSprite != null) phoneSprite.enabled = false;
+
+        if (phoneButton != null)
+        {
+            phoneButton.onClick.RemoveAllListeners();
+            phoneButton.onClick.AddListener(StopPhoneCall);
+        }
+
+        StartCoroutine(StartPhoneAfterDelay());
     }
 
-    // ======================
-    // Главный цикл ночи
-    // ======================
+    private IEnumerator StartPhoneAfterDelay()
+    {
+        yield return new WaitForSeconds(phoneStartDelay);
+        StartPhoneCall();
+    }
+
+    private void StartPhoneCall()
+    {
+        if (phoneActive || phoneAudio == null || phoneSprite == null) return;
+
+        phoneActive = true;
+        phoneSprite.enabled = true;
+        phoneSprite.color = Color.white; // делаем видимым
+
+        phoneAudio.Play();
+
+        if (showDebugLogs)
+            Debug.Log("📞 Телефонный звонок начался!");
+    }
+
+    public void StopPhoneCall()
+    {
+        if (!phoneActive) return;
+
+        phoneActive = false;
+
+        if (phoneAudio != null)
+            phoneAudio.Stop();
+
+        if (phoneSprite != null)
+        {
+            // Прозрачный, но остаётся объект
+            phoneSprite.color = new Color(1, 1, 1, 0);
+            phoneSprite.enabled = false;
+        }
+
+        if (showDebugLogs)
+            Debug.Log("📴 Телефон отключен игроком.");
+    }
+
     private void Update()
     {
         if (nightEnded) return;
@@ -100,17 +154,15 @@ public class NightManager : MonoBehaviour
 
         UpdateAnimatronicDifficulties();
         UpdateFoxyDifficulties();
+        UpdatePhoneCall(); // проверка окончания звука
 
-        // Проверяем конец ночи
         if (nightTimer >= nightLength)
         {
             EndNight();
         }
     }
 
-    // ======================
-    // Управление аниматрониками
-    // ======================
+
     private void UpdateAnimatronicDifficulties()
     {
         foreach (var s in animatronicSettings)
@@ -130,7 +182,6 @@ public class NightManager : MonoBehaviour
                 }
             }
 
-            // Изменение сложности
             if (!lastDifficulty.ContainsKey(s.animatronic) || lastDifficulty[s.animatronic] != newDifficulty)
             {
                 s.animatronic.difficulty = newDifficulty;
@@ -140,7 +191,6 @@ public class NightManager : MonoBehaviour
                     Debug.Log($"🎚 {s.animatronic.name} → новая сложность: {newDifficulty} (время {nightTimer:F1}с)");
             }
 
-            // Активация движения
             if (activated && !s.animatronic.CanMove)
             {
                 s.animatronic.CanMove = true;
@@ -150,9 +200,6 @@ public class NightManager : MonoBehaviour
         }
     }
 
-    // ======================
-    // Управление Фокси
-    // ======================
     private void UpdateFoxyDifficulties()
     {
         foreach (var f in foxySettings)
@@ -190,9 +237,6 @@ public class NightManager : MonoBehaviour
         }
     }
 
-    // ======================
-    // Конец ночи
-    // ======================
     private void EndNight()
     {
         nightEnded = true;
@@ -220,12 +264,20 @@ public class NightManager : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
-    // ======================
-    // Game Over
-    // ======================
+    private void UpdatePhoneCall()
+    {
+        if (phoneActive && phoneAudio != null && !phoneAudio.isPlaying)
+        {
+            // Звук закончился — выключаем всё
+            StopPhoneCall();
+            if (showDebugLogs)
+                Debug.Log("📴 Телефонный звонок завершён автоматически.");
+        }
+    }
+
+
     public void TriggerGameOver(string killer)
     {
         Debug.Log($"💀 ИГРА ОКОНЧЕНА — {killer} добрался до офиса!");
-        // Здесь можно добавить переход на сцену GameOver
     }
 }
