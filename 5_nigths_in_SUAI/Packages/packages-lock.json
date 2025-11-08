@@ -43,7 +43,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.31",
+      "version": "3.0.38",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -75,8 +75,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.nuget.newtonsoft-json": {
-      "version": "3.2.1",
-      "depth": 1,
+      "version": "3.2.2",
+      "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -166,7 +166,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.6",
+      "version": "3.0.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -196,7 +196,7 @@
       }
     },
     "com.unity.visualscripting": {
-      "version": "1.9.4",
+      "version": "1.9.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -204,13 +204,6 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
-    },
-    "jillejr.newtonsoft.json-for-unity": {
-      "version": "https://github.com/jilleJr/Newtonsoft.Json-for-Unity.git#upm",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "f2c6cb09817832dccd0600f291053d8d55298ee9"
     },
     "link.neocortex.ollama": {
       "version": "https://github.com/neocortex-link/neocortex-ollama-support.git",
