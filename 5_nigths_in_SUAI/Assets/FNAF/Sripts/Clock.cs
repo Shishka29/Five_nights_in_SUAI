@@ -11,7 +11,7 @@ public class Clock : MonoBehaviour
     private void Awake()
     {
         clock = gameObject.GetComponent<Text>();
-        InvokeRepeating("Timer", 60f, 60f);
+        InvokeRepeating("Timer", 90f, 90f);
     }
 
     public void Timer()
