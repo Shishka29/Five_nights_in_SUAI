@@ -6,6 +6,7 @@ using UnityEngine.UI; // 🟢 добавляем, чтобы работать с
 public class tabcontroller : MonoBehaviour
 {
     public static tabcontroller Instance;
+    public Battery energy;
 
     [Header("Cameras")]
     public GameObject mainCamera;
@@ -67,9 +68,14 @@ public class tabcontroller : MonoBehaviour
 
         TurnOffAllLightsInstant();
     }
+  
 
     void Update()
     {
+        if (energy.energy <= 0)
+        {
+            Close();
+        }
         if (minimap != null && minimap.activeSelf)
         {
             if (camerasActive && cameraLights != null && currentCameraIndex < cameraLights.Length)
@@ -122,10 +128,21 @@ public class tabcontroller : MonoBehaviour
 
     public void tabChangeVisible()
     {
-        if (minimap != null && minimap.activeSelf)
+        // Не позволяем открыть планшет при нулевой энергии
+        if (energy.energy <= 0)
+        {
             Close();
+            return;
+        }
+        // Переключаем состояние: если открыт - закрываем, если закрыт - открываем
+        if (minimap != null && minimap.activeSelf)
+        {
+            Close();
+        }
         else
+        {
             StartCoroutine(Open());
+        }
     }
 
     IEnumerator Open()

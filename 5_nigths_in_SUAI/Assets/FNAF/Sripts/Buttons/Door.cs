@@ -8,15 +8,26 @@ public class Door : MonoBehaviour
     public Vector3 closePosition;
     public bool isOpen = true;
     public bool action = false;
+    public Battery energy;
 
     public void ButtonPressed()
     {
-        isOpen = !isOpen;
-        action = true;
+        if (energy.energy > 0) 
+        {
+            isOpen = !isOpen;
+            action = true;
+        }
+        
     }
     private void Update()
     {
         Vector3 NextPosition;
+
+        if (energy.energy <= 0)
+        {
+            isOpen = true;
+            action = true;
+        }
         if (isOpen)
         {
             NextPosition = openPosition;

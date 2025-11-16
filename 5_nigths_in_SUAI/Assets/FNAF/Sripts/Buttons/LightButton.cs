@@ -7,6 +7,7 @@ public class LightButton : MonoBehaviour
     public string lightID = "Left"; // "Left" или "Right"
     public GameObject doorLight;
     Vector3 position;
+    public Battery energy;
 
     // свойство для проверки света
     public bool IsLightOn => doorLight != null && doorLight.activeSelf;
@@ -17,10 +18,22 @@ public class LightButton : MonoBehaviour
         doorLight.SetActive(false);
     }
 
+    private void Update()
+    {
+        if (energy.energy <= 0)
+        {
+            doorLight.SetActive(false);
+        }
+    }
+
     void OnMouseDown()
     {
         transform.localPosition = position - transform.forward * 0.03f;
-        doorLight.SetActive(true);
+        if (energy.energy > 0)
+        {
+            doorLight.SetActive(true);
+        }
+        
     }
 
     void OnMouseUp()
