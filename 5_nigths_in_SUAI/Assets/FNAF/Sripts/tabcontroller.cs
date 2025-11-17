@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI; // 🟢 добавляем, чтобы работать с Image
+using static Battery;
 
 public class tabcontroller : MonoBehaviour
 {
