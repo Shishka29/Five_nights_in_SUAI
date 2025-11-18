@@ -2476,7 +2476,7 @@ MonoBehaviour:
   customNightCanvas: {fileID: 359819543}
   introPanel: {fileID: 870747746}
   introImage: {fileID: 28204911}
-  newGameIntroSprite: {fileID: 21300000, guid: 20ed94e5bc8b3b84e908fc2bfa004068, type: 3}
+  newGameIntroSprite: {fileID: 21300000, guid: 83735b35e45be1f43a8f7a98caf4ba45, type: 3}
   introDuration: 2
   fadePanel: {fileID: 1302492773}
   fadeDuration: 1

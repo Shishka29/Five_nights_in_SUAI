@@ -6,6 +6,7 @@ using static Battery;
 
 public class tabcontroller : MonoBehaviour
 {
+
     public static tabcontroller Instance;
     public Battery energy;
 
@@ -175,7 +176,7 @@ public class tabcontroller : MonoBehaviour
         UpdateRoomSprite(currentCameraIndex);
     }
 
-    void Close()
+    public void Close()
     {
         // выключаем фоновый звук планшета
         if (audioSource && audioSource.clip == soundLoop)

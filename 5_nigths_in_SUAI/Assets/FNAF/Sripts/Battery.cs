@@ -1,12 +1,13 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class Battery : MonoBehaviour
 {
     [Header("Battery Settings")]
     public float energy = 100f;
-    public float baseDischarge = 0.2f;  // ·‡ÁÓ‚‡ˇ Ú‡Ú‡ ˝ÌÂ„ËË
+    public float baseDischarge = 0.2f;  // –±–∞–∑–æ–≤–∞—è —Ç—Ä–∞—Ç–∞ —ç–Ω–µ—Ä–≥–∏–∏
 
     [Header("Usage Icon Sprites")]
     public Image usageImage;
@@ -14,6 +15,9 @@ public class Battery : MonoBehaviour
     public Sprite usage1;
     public Sprite usage2;
     public Sprite usage3;
+
+    [Header("UI Power Text")]
+    public TMP_Text powerText;   // –¢–ï–ö–°–¢ "Power left: X%"
 
     [Header("References")]
     public Door leftDoor;
@@ -42,6 +46,7 @@ public class Battery : MonoBehaviour
     {
         CalculateUsage();
         UpdateUsageSprite();
+        UpdatePowerText();   // üî• –æ–±–Ω–æ–≤–ª—è–µ–º —Ç–µ–∫—Å—Ç –∫–∞–∂–¥—ã–π –∫–∞–¥—Ä
     }
 
     private void CalculateUsage()
@@ -49,7 +54,7 @@ public class Battery : MonoBehaviour
         currentUsage = 0;
         currentCost = baseDischarge;
 
-        // --- ƒ¬≈–» ---
+        // --- –î–í–ï–†–ò ---
         if (leftDoor && !leftDoor.isOpen)
         {
             currentUsage++;
@@ -62,7 +67,7 @@ public class Battery : MonoBehaviour
             currentCost += rightDoorCost;
         }
 
-        // --- ƒ¬≈–Õ€≈ ‘ŒÕ¿–» ---
+        // --- –î–í–ï–†–ù–´–ï –§–û–ù–ê–†–ò ---
         if (leftLight && leftLight.doorLight && leftLight.doorLight.activeSelf)
         {
             currentUsage++;
@@ -75,12 +80,12 @@ public class Battery : MonoBehaviour
             currentCost += rightLightCost;
         }
 
-        // ---  ¿Ã≈–Õ€… —¬≈“ ---
+        // --- –ö–ê–ú–ï–†–ù–´–ô –°–í–ï–¢ ---
         bool camLightActive =
             tablet != null &&
-            tablet.minimap.activeSelf &&               // ÔÎ‡Ì¯ÂÚ ÓÚÍ˚Ú
-            Input.GetMouseButton(0) &&                // Á‡Ê‡Ú‡ À Ã
-            !EventSystem.current.IsPointerOverGameObject(); // ÌÂ ÔÓ UI
+            tablet.minimap.activeSelf &&
+            Input.GetMouseButton(0) &&
+            !EventSystem.current.IsPointerOverGameObject();
 
         if (camLightActive)
         {
@@ -88,7 +93,7 @@ public class Battery : MonoBehaviour
             currentCost += camLightCost;
         }
 
-        // --- œÀ¿Õÿ≈“ ---
+        // --- –ü–õ–ê–ù–®–ï–¢ ---
         if (tablet != null && tablet.minimap.activeSelf)
         {
             currentUsage++;
@@ -99,8 +104,7 @@ public class Battery : MonoBehaviour
     private void ApplyBatteryDrain()
     {
         energy -= currentCost;
-        if (energy < 0) energy = 0;
-        if (energy > 100) energy = 100;
+        energy = Mathf.Clamp(energy, 0, 100);
     }
 
     private void UpdateUsageSprite()
@@ -109,18 +113,18 @@ public class Battery : MonoBehaviour
 
         switch (currentUsage)
         {
-            case 0:
-                usageImage.sprite = usage0;
-                break;
-            case 1:
-                usageImage.sprite = usage1;
-                break;
-            case 2:
-                usageImage.sprite = usage2;
-                break;
-            default:
-                usageImage.sprite = usage3; // 3+
-                break;
+            case 0: usageImage.sprite = usage0; break;
+            case 1: usageImage.sprite = usage1; break;
+            case 2: usageImage.sprite = usage2; break;
+            default: usageImage.sprite = usage3; break; // 3+
         }
+    }
+
+    private void UpdatePowerText()
+    {
+        if (powerText == null) return;
+
+        int roundedPower = Mathf.RoundToInt(energy);
+        powerText.text = $"Power left: {roundedPower}%";
     }
 }

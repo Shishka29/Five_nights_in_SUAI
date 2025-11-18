@@ -20,6 +20,13 @@ public class Door : MonoBehaviour
         }
         
     }
+    public void ForceOpen()
+    {
+        isOpen = true;
+        action = true;
+    }
+
+
     private void Update()
     {
         Vector3 NextPosition;

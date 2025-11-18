@@ -26,6 +26,12 @@ public class LightButton : MonoBehaviour
             doorLight.SetActive(false);
         }
     }
+    public void ForceOff()
+    {
+        if (doorLight != null)
+            doorLight.SetActive(false);
+    }
+
 
     void OnMouseDown()
     {
