@@ -18,5 +18,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 824b249b7bc6f18448fec2ae4555849f, type: 2}
   linkedCamera: {fileID: 0}
   cameraIndex: 4
-  mapPosition: {x: 4.3, y: 0, z: 14.07}
+  mapPosition: {x: 4.3, y: 0.5, z: 14.07}
   stageLevel: 5
