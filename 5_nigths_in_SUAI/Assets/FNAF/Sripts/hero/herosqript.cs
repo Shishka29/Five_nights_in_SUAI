@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class herosqript : MonoBehaviour
 {
+    private bool canLook = true;
+
     public tabcontroller tabletController;
     public float sensitivy = 375f;
     float rotateZone = Screen.width / 5;
 
     void Update()
     {
+        if (!canLook) return; // если заблокировано, не вращаемс€
+
         if (tabletController != null && tabletController.minimap.activeSelf)
         {
             // ѕланшет открыт Ч не вращаем голову
@@ -25,4 +29,10 @@ public class herosqript : MonoBehaviour
             transform.Rotate(0, sensitivy * Time.deltaTime, 0);
         }
     }
+
+    public void BlockLook(bool state)
+    {
+        canLook = !state; // true = блокируем
+    }
+
 }

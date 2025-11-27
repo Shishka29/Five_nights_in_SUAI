@@ -19,6 +19,8 @@ public class tabcontroller : MonoBehaviour
     public GameObject Tablet;
 
     private Animator anim;
+    public bool IsTabletOpen => minimap != null && minimap.activeSelf;
+
     private int currentCameraIndex = 0;
 
     [System.Serializable]

@@ -112,7 +112,7 @@ public class MenuManager : MonoBehaviour
     public void OpenGachi()
     {
         HideMenuUI();
-        StartCoroutine(FadeAndLoad("GachiScene", showIntro: false));
+        StartCoroutine(FadeAndLoad("Prize", showIntro: false));
     }
 
     public void OpenCustomNight()

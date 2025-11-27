@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement; // <- добавляем
 
 public class AnimatronicAI : MonoBehaviour
 {
@@ -44,6 +45,28 @@ public class AnimatronicAI : MonoBehaviour
     private List<Room> allowedRooms = new();
     private static List<AnimatronicAI> allAnimatronics = new();
     private bool isRecovering = false;
+
+    [Header("Screamer Settings")]
+    public bool hasScreamer = false;              // Включить скример для этого аниматроника
+    public GameObject screamerModel;              // Модель скримера
+    public Animator screamerAnimator;             // Аниматор скримера
+    public AudioSource screamerAudioSource;       // Аудио проигрыватель
+    public AudioClip screamerSound;               // Звук скримера
+    public string screamerAnimationName = "Jumpscare"; // Имя анимации
+    public float gameOverDelay = 2.5f;            // Задержка перед сценой GameOver
+    public string gameOverScene = "GameOver";     // Имя сцены GameOver
+
+    [Header("Player & Camera Settings")]
+    public herosqript playerLook;               // Скрипт вращения игрока на объекте Player
+    public Camera mainCamera;                   // Камера, которая висит на Player
+    public Vector3 inspectorPlayerEulerAngles;  // Поворот Player во время скримера
+    public float playerRotationSpeed = 5f;      // Скорость плавного поворота Player
+
+
+    [Header("Screamer Trigger Settings")]
+    public bool startScreamerIfTabletOpen = true; // Можно запускать, если планшет открыт
+    public Vector2 playerYawRange = new Vector2(150f, 210f);   // диапазон углов по Y (лево-право)
+    public Vector2 playerPitchRange = new Vector2(-10f, 30f);  // диапазон углов по X (вверх-вниз)
 
     void Awake()
     {
@@ -130,16 +153,17 @@ public class AnimatronicAI : MonoBehaviour
         backwardChance = Mathf.Lerp(0.2f, 0.05f, difficulty / 20f);
     }
 
+    private bool hasTriggeredScreamer = false;
+
     void MoveToNextRoom()
     {
         if (currentRoom == null) return;
 
+        // Получаем все доступные соседние комнаты
         List<Room> connected = GetConnectedRooms(currentRoom);
         connected.RemoveAll(IsRoomOccupied);
         connected.RemoveAll(IsRoomVisible);
-
-        // 🔸 Не идти в комнату, где включен свет
-        connected = connected.Where(r => !IsLightBlocking(r)).ToList();
+        connected = connected.Where(r => !IsLightBlocking(r)).ToList(); // не идти в комнаты с включенным светом
 
         if (connected.Count == 0)
         {
@@ -153,24 +177,159 @@ public class AnimatronicAI : MonoBehaviour
 
         lastRoom = currentRoom;
 
-        // Проверка двери офиса
-        if (nextRoom == targetRoom && officeDoor != null && !officeDoor.isOpen)
+        // 🔹 Если следующая комната — офис
+        if (nextRoom == targetRoom)
         {
-            if (showDebugLogs)
-                Debug.Log($"{name} врезался в закрытую дверь офиса! Возвращается на старт.");
-            StartCoroutine(Recover());
-            return;
+            // Дверь закрыта — возвращаемся на старт
+            if (officeDoor != null && !officeDoor.isOpen)
+            {
+                if (showDebugLogs)
+                    Debug.Log($"{name}: дверь офиса закрыта, возвращаюсь на старт!");
+                StartCoroutine(Recover());
+                return;
+            }
+
+            // Условия для скримера не выполнены — остаёмся на месте
+            if (!CheckScreamerConditions())
+            {
+                if (showDebugLogs)
+                    Debug.Log($"{name}: жду условий для скримера, не вхожу в офис.");
+                return;
+            }
         }
 
+        // Можно переходить в комнату
         currentRoom = nextRoom;
         MoveModelToRoom(currentRoom);
 
         if (showDebugLogs)
             Debug.Log($"{name} перешёл из {lastRoom.roomName} → {currentRoom.roomName}");
 
+        // Если это офис — запускаем скример
         if (currentRoom == targetRoom)
+        {
+            TriggerScreamer();
             NightManager.Instance.TriggerGameOver(name);
+        }
     }
+
+
+
+    bool CheckScreamerConditions()
+    {
+        // Планшет открыт
+        var tab = tabcontroller.Instance;
+        if (startScreamerIfTabletOpen && tab != null && tab.IsTabletOpen)
+            return true;
+
+        // Игрок смотрит в диапазон
+        if (playerLook != null)
+        {
+            Vector3 euler = playerLook.transform.eulerAngles;
+            float yaw = NormalizeAngle(euler.y);
+            float pitch = NormalizeAngle(euler.x);
+
+            if (yaw >= playerYawRange.x && yaw <= playerYawRange.y &&
+                pitch >= playerPitchRange.x && pitch <= playerPitchRange.y)
+                return true;
+        }
+
+        return false;
+    }
+
+
+    private bool ShouldTriggerScreamer()
+    {
+        var tab = tabcontroller.Instance;
+        bool tabletOpen = startScreamerIfTabletOpen && tab != null && tab.IsTabletOpen;
+
+        bool playerLooking = false;
+        if (playerLook != null)
+        {
+            Vector3 euler = playerLook.transform.eulerAngles;
+            float yaw = NormalizeAngle(euler.y);
+            float pitch = NormalizeAngle(euler.x);
+            playerLooking = yaw >= playerYawRange.x && yaw <= playerYawRange.y &&
+                            pitch >= playerPitchRange.x && pitch <= playerPitchRange.y;
+        }
+
+        return tabletOpen || playerLooking;
+    }
+
+    private float NormalizeAngle(float angle)
+    {
+        while (angle > 180f) angle -= 360f;
+        while (angle < -180f) angle += 360f;
+        return angle;
+    }
+
+    void TriggerScreamer()
+    {
+        if (!hasScreamer || screamerModel == null) return;
+
+        // 🔹 Блокируем вращение Player
+        if (playerLook != null)
+            playerLook.BlockLook(true);
+
+        // 🔹 Скрываем обычную модель аниматроника
+        if (animatronicModel != null)
+            animatronicModel.gameObject.SetActive(false);
+
+        // 🔹 Закрываем планшет
+        var tab = tabcontroller.Instance;
+        if (tab != null && tab.IsTabletOpen)
+            tab.Close();
+
+        // 🔹 Включаем модель скримера
+        screamerModel.SetActive(true);
+
+        // 🔹 Поворот Player на инспекторные углы
+        if (playerLook != null)
+            StartCoroutine(RotatePlayerToInspectorRotation());
+
+        // 🔹 Анимация скримера
+        if (screamerAnimator != null && !string.IsNullOrEmpty(screamerAnimationName))
+            screamerAnimator.Play(screamerAnimationName, 0, 0f);
+
+        // 🔹 Проигрываем звук
+        if (screamerAudioSource != null && screamerSound != null)
+            screamerAudioSource.PlayOneShot(screamerSound);
+
+        // 🔹 Переход в GameOver
+        StartCoroutine(GameOverDelayCoroutine());
+    }
+
+    private IEnumerator RotatePlayerToInspectorRotation()
+    {
+        Quaternion targetRotation = Quaternion.Euler(inspectorPlayerEulerAngles);
+
+        while (Quaternion.Angle(playerLook.transform.rotation, targetRotation) > 0.5f)
+        {
+            playerLook.transform.rotation = Quaternion.Slerp(
+                playerLook.transform.rotation,
+                targetRotation,
+                Time.deltaTime * playerRotationSpeed
+            );
+            yield return null;
+        }
+
+        playerLook.transform.rotation = targetRotation;
+    }
+
+
+    // Корутина для GameOver
+    private IEnumerator GameOverDelayCoroutine()
+    {
+        yield return new WaitForSeconds(gameOverDelay);
+        SceneManager.LoadScene(gameOverScene);
+    }
+
+   
+
+
+
+
+
 
     // 🔸 Проверка: свет мешает ли входу в комнату
     bool IsLightBlocking(Room nextRoom)
@@ -203,7 +362,7 @@ public class AnimatronicAI : MonoBehaviour
     IEnumerator Recover()
     {
         isRecovering = true;
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.3f);
 
         if (startRoom != null)
         {
