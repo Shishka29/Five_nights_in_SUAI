@@ -17,4 +17,6 @@ public class Room : ScriptableObject
     [Header("Map Settings")]
     public Vector3 mapPosition;
     public int stageLevel;
+
+
 }
