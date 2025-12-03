@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // нужно для кнопки и спрайта
+using UnityEngine.UI;
 
 [System.Serializable]
 public class DifficultySegment
@@ -46,28 +46,26 @@ public class NightManager : MonoBehaviour
     public List<FoxySettings> foxySettings = new();
 
     [Header("📞 Телефонный звонок")]
-    [Tooltip("Через сколько секунд после старта ночи включается звонок (например 5–7)")]
     public float phoneStartDelay = 6f;
-    public AudioSource phoneAudio;       // звук звонка
-    public Image phoneSprite;            // спрайт телефона
-    public Button phoneButton;           // кнопка отключения
+    public AudioSource phoneAudio;
+    public Image phoneSprite;
+    public Button phoneButton;
 
     private Dictionary<object, int> lastDifficulty = new();
     private bool nightEnded = false;
     private bool phoneActive = false;
 
+    [Header("Награды")]
+    public int baseReward = 500;
+
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
+        Instance = this; // ссылка на NightManager, пересоздаётся каждый раз
     }
 
     private void Start()
     {
+        PlayerData.Instance.ResetNightStats();
         nightTimer = 0f;
         nightEnded = false;
         lastDifficulty.Clear();
@@ -93,7 +91,6 @@ public class NightManager : MonoBehaviour
         if (showDebugLogs)
             Debug.Log("🌙 Ночь началась!");
 
-        // Настройка телефона
         if (phoneAudio != null) phoneAudio.Stop();
         if (phoneSprite != null) phoneSprite.enabled = false;
 
@@ -118,7 +115,7 @@ public class NightManager : MonoBehaviour
 
         phoneActive = true;
         phoneSprite.enabled = true;
-        phoneSprite.color = Color.white; // делаем видимым
+        phoneSprite.color = Color.white;
 
         phoneAudio.Play();
 
@@ -132,12 +129,10 @@ public class NightManager : MonoBehaviour
 
         phoneActive = false;
 
-        if (phoneAudio != null)
-            phoneAudio.Stop();
+        if (phoneAudio != null) phoneAudio.Stop();
 
         if (phoneSprite != null)
         {
-            // Прозрачный, но остаётся объект
             phoneSprite.color = new Color(1, 1, 1, 0);
             phoneSprite.enabled = false;
         }
@@ -154,14 +149,11 @@ public class NightManager : MonoBehaviour
 
         UpdateAnimatronicDifficulties();
         UpdateFoxyDifficulties();
-        UpdatePhoneCall(); // проверка окончания звука
+        UpdatePhoneCall();
 
         if (nightTimer >= nightLength)
-        {
             EndNight();
-        }
     }
-
 
     private void UpdateAnimatronicDifficulties()
     {
@@ -237,47 +229,103 @@ public class NightManager : MonoBehaviour
         }
     }
 
+    [Header("Fade")]
+    public Image fadeImage;       // Привяжи черный Image поверх всех UI
+    public float fadeDuration = 1f;
+
     private void EndNight()
     {
+        // Сохраняем данные игрока
+        if (Battery.Instance != null)
+            PlayerData.Instance.energyLeft = Mathf.RoundToInt(Battery.Instance.energy);
+
+        // Добавляем базовую награду в pendingReward
+        PlayerData.Instance.pendingReward = baseReward;
+
+        if (ProgressManager.Instance != null)
+        {
+            if (ProgressManager.Instance.completedNight < 6)
+                ProgressManager.Instance.completedNight += 1;
+
+            ProgressManager.Instance.SaveProgress();
+        }
+
+        PlayerData.Instance.Save();
+
+        nightTimer = 0f;
         nightEnded = true;
-        Debug.Log("🌅 Ночь завершена! 6:00 AM — Возврат в главное меню...");
 
         foreach (var s in animatronicSettings)
-        {
-            if (s.animatronic != null)
-                s.animatronic.CanMove = false;
-        }
+            if (s.animatronic != null) s.animatronic.CanMove = false;
 
         foreach (var f in foxySettings)
+            if (f.foxy != null) f.foxy.CanMove = false;
+
+        // Запускаем плавное затемнение перед сценой Win
+        StartCoroutine(FadeImageAndLoadScene("Win"));
+    }
+
+    private IEnumerator FadeImageAndLoadScene(string sceneName)
+    {
+        if (fadeImage != null)
         {
-            if (f.foxy != null)
-                f.foxy.CanMove = false;
+            fadeImage.gameObject.SetActive(true);
+            Color color = fadeImage.color;
+            color.a = 0f;
+            fadeImage.color = color;
+
+            float timer = 0f;
+            while (timer < fadeDuration)
+            {
+                timer += Time.deltaTime;
+                color.a = Mathf.Clamp01(timer / fadeDuration);
+                fadeImage.color = color;
+                yield return null;
+            }
         }
 
-        StartCoroutine(ReturnToMainMenu());
+        SceneManager.LoadScene(sceneName);
     }
 
-    private IEnumerator ReturnToMainMenu()
-    {
-        yield return new WaitForSeconds(delayBeforeMenu);
-        Debug.Log("🎬 Загрузка главного меню...");
-        SceneManager.LoadScene("MainMenu");
-    }
+
+
 
     private void UpdatePhoneCall()
     {
         if (phoneActive && phoneAudio != null && !phoneAudio.isPlaying)
         {
-            // Звук закончился — выключаем всё
             StopPhoneCall();
             if (showDebugLogs)
                 Debug.Log("📴 Телефонный звонок завершён автоматически.");
         }
     }
 
-
     public void TriggerGameOver(string killer)
     {
         Debug.Log($"💀 ИГРА ОКОНЧЕНА — {killer} добрался до офиса!");
+        StartCoroutine(FadeToGameOver());
+    }
+
+    private IEnumerator FadeToGameOver()
+    {
+        if (fadeImage != null)
+        {
+            fadeImage.gameObject.SetActive(true);
+            Color color = fadeImage.color;
+            color.a = 0f;
+            fadeImage.color = color;
+
+            float timer = 0f;
+            while (timer < fadeDuration)
+            {
+                timer += Time.deltaTime;
+                color.a = Mathf.Clamp01(timer / fadeDuration);
+                fadeImage.color = color;
+                yield return null;
+            }
+        }
+
+        // После затемнения переходим на сцену GameOver
+        SceneManager.LoadScene("GameOver");
     }
 }

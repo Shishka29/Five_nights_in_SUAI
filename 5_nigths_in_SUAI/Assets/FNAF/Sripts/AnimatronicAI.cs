@@ -68,6 +68,7 @@ public class AnimatronicAI : MonoBehaviour
     public Vector2 playerYawRange = new Vector2(150f, 210f);   // диапазон углов по Y (лево-право)
     public Vector2 playerPitchRange = new Vector2(-10f, 30f);  // диапазон углов по X (вверх-вниз)
 
+
     void Awake()
     {
         if (!allAnimatronics.Contains(this))
@@ -183,6 +184,7 @@ public class AnimatronicAI : MonoBehaviour
             // Дверь закрыта — возвращаемся на старт
             if (officeDoor != null && !officeDoor.isOpen)
             {
+                PlayerData.Instance.AddReflectedAttack();
                 if (showDebugLogs)
                     Debug.Log($"{name}: дверь офиса закрыта, возвращаюсь на старт!");
                 StartCoroutine(Recover());

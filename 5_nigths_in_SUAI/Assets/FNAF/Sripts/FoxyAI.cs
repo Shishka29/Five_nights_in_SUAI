@@ -14,11 +14,6 @@ public class FoxyAI : MonoBehaviour
     public Room officeRoom;
     public Door officeDoor;
 
-    [Header("Проверка занятости комнаты")]
-    public Room[] blockedRooms;       // Комнаты, в которых нельзя стоять одновременно
-    public Transform[] otherBots;     // Аниматроники, чьё положение проверяем
-    public float roomCheckRadius = 1f;
-
     [Header("Модели по стадиям")]
     public GameObject foxyStage0;
     public GameObject foxyStage1;
@@ -29,14 +24,11 @@ public class FoxyAI : MonoBehaviour
     public Transform stage1Pos;
     public Transform stage2Pos;
 
-    [Header("Скример / Бег модели")]
-    public GameObject runModel;
-    public Animator runAnimator;
+    [Header("Скример")]
     public GameObject screamerModel;
     public Animator screamerAnimator;
     public AudioSource screamerAudioSource;
     public AudioClip screamerSound;
-    public string runAnimationName = "Run";
     public string screamerAnimationName = "Jumpscare";
     public float screamerDelay = 2f;
     public float gameOverDelay = 2.5f;
@@ -44,7 +36,6 @@ public class FoxyAI : MonoBehaviour
 
     [Header("Player & Camera Settings")]
     public herosqript playerLook;
-    public Camera mainCamera;
     public Vector3 inspectorPlayerEulerAngles;
     public float playerRotationSpeed = 5f;
 
@@ -57,6 +48,8 @@ public class FoxyAI : MonoBehaviour
     private int foxyStage = 0;
     private bool isRunning = false;
     private bool isRecovering = false;
+
+
     void Start()
     {
         foxyStage = 0;
@@ -65,7 +58,6 @@ public class FoxyAI : MonoBehaviour
         MoveFoxyToStage();
         UpdateModelVisibility();
 
-        if (runModel) runModel.SetActive(false);
         if (screamerModel) screamerModel.SetActive(false);
 
         StartCoroutine(BehaviorLoop());
@@ -113,56 +105,24 @@ public class FoxyAI : MonoBehaviour
     }
 
     // -------------------------------------------------------
-    // ❗ ПРОСТАЯ ПРОВЕРКА: стоит ли аниматроник в комнате?
+    //     ФОКСИ ВЫБЕГАЕТ — БЕЗ АНИМАЦИИ, ПРОСТО ТЕЛЕПОРТ
     // -------------------------------------------------------
-    bool IsRoomBlocked()
-    {
-        foreach (var room in blockedRooms)
-        {
-            foreach (var bot in otherBots)
-            {
-                if (bot == null) continue;
-
-                float dist = Vector3.Distance(bot.position, room.mapPosition);
-
-                if (dist <= roomCheckRadius)
-                {
-                    if (showDebugLogs)
-                        Debug.Log($"🚫 Комната {room.roomName} занята {bot.name} — Фокси ждёт!");
-
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     IEnumerator RunToOffice()
     {
-        // 🔥 простая проверка
-        if (IsRoomBlocked())
-            yield break;
-
         isRunning = true;
 
         if (showDebugLogs)
             Debug.Log("🏃‍♂️ Фокси выбежал!");
 
-        // выключить стадии
+        // выключить визуальные стадии полностью
         SetAllModelsActive(false);
 
-        // включить бегущую модель
-        if (runModel) runModel.SetActive(true);
-        if (runAnimator) runAnimator.Play(runAnimationName, 0, 0f);
+        // Телепорт в офис
+        if (officeRoom != null)
+            transform.position = officeRoom.mapPosition;
 
-        // телепорт в офис
-        transform.position = officeRoom.mapPosition;
-
-        // "бег"
+        // Пауза перед проверкой двери
         yield return new WaitForSeconds(screamerDelay);
-
-        // сразу убрать модель бега
-        if (runModel) runModel.SetActive(false);
 
         bool doorClosed = (officeDoor != null && !officeDoor.isOpen);
 
@@ -180,8 +140,6 @@ public class FoxyAI : MonoBehaviour
 
     IEnumerator TriggerScreamer()
     {
-        if (runModel) runModel.SetActive(false);
-
         var tab = tabcontroller.Instance;
         if (tab != null && tab.IsTabletOpen)
             tab.Close();
@@ -223,14 +181,13 @@ public class FoxyAI : MonoBehaviour
     IEnumerator Recover()
     {
         isRecovering = true;
+        PlayerData.Instance.AddReflectedAttack();
 
         yield return new WaitForSeconds(5f);
 
         foxyStage = 0;
         MoveFoxyToStage();
         UpdateModelVisibility();
-
-        if (runModel) runModel.SetActive(false);
 
         if (showDebugLogs)
             Debug.Log("🔄 Фокси вернулся в Pirate Cove.");
@@ -247,6 +204,7 @@ public class FoxyAI : MonoBehaviour
 
         return tab.CurrentCameraIndex == pirateCoveRoom.cameraIndex;
     }
+
 
     void MoveFoxyToStage()
     {
@@ -281,8 +239,8 @@ public class FoxyAI : MonoBehaviour
         if (foxyStage2) foxyStage2.SetActive(active);
     }
 
-    public Transform targetPoint;   // точка, куда телепортировать
-    public GameObject model;        // модель, которую переносим
+    public Transform targetPoint;   // точка возврата
+    public GameObject model;        // модель фокси
 
     public void TeleportModel()
     {
@@ -292,5 +250,4 @@ public class FoxyAI : MonoBehaviour
             model.transform.rotation = targetPoint.rotation;
         }
     }
-
 }

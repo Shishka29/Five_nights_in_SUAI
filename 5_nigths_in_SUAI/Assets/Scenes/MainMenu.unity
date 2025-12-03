@@ -236,7 +236,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 83735b35e45be1f43a8f7a98caf4ba45, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -632,7 +632,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &359819541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1537,7 +1537,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2462,13 +2462,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainMenuCanvas: {fileID: 1134982402}
   menuImage: {fileID: 2140259884}
-  menuSprites:
+  menuProgressSprites:
   - {fileID: 21300000, guid: 6cb1b8716f5796e4485226f41f5256a0, type: 3}
   - {fileID: 21300000, guid: 8746b905cd736ab4497f465165cc1254, type: 3}
   - {fileID: 21300000, guid: d73d7d377153bcd4db44fef4465da8de, type: 3}
   - {fileID: 21300000, guid: 425275e1cde33c141b12f062563f20c6, type: 3}
   - {fileID: 21300000, guid: ca33d67de1d8a344ab314a6fcf02cf96, type: 3}
   - {fileID: 21300000, guid: baa17128e6ae9a44eb1253c00626d190, type: 3}
+  nightIntroSprites:
+  - {fileID: 21300000, guid: 5d3e0f0bf0b186c4da588311dc26d776, type: 3}
+  - {fileID: 21300000, guid: bd594126a801f2348baa190c593d719f, type: 3}
+  - {fileID: 21300000, guid: 7f485fcab0d285b4ebbf2173b81d0913, type: 3}
+  - {fileID: 21300000, guid: c49f679d65aa5aa449db8f9cb264c474, type: 3}
+  - {fileID: 21300000, guid: 85b024ffa71f74e488622ade6a5621f9, type: 3}
+  - {fileID: 21300000, guid: 313148aaf9eb8054281ea789a5fb5270, type: 3}
   newGameButton: {fileID: 978189228}
   continueButton: {fileID: 2100228307}
   gachiButton: {fileID: 721540994}
@@ -2476,7 +2483,6 @@ MonoBehaviour:
   customNightCanvas: {fileID: 359819543}
   introPanel: {fileID: 870747746}
   introImage: {fileID: 28204911}
-  newGameIntroSprite: {fileID: 21300000, guid: 83735b35e45be1f43a8f7a98caf4ba45, type: 3}
   introDuration: 2
   fadePanel: {fileID: 1302492773}
   fadeDuration: 1
@@ -2970,6 +2976,70 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1625496774}
   m_CullTransparentMesh: 1
+--- !u!1 &1640856009
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1640856011}
+  - component: {fileID: 1640856010}
+  - component: {fileID: 1640856012}
+  m_Layer: 0
+  m_Name: player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1640856010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640856009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0e0500253897404bb75a672c8064d2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coins: 100
+  reflectedAttacks: 0
+  ownedItems: []
+  energyLeft: 100
+  pendingReward: 0
+--- !u!4 &1640856011
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640856009}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1530.5488, y: 273.9537, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1640856012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640856009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a36cc90d2641ce4bb56380b1edded3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  completedNight: 0
+  coins: 0
 --- !u!1 &1677048987
 GameObject:
   m_ObjectHideFlags: 0

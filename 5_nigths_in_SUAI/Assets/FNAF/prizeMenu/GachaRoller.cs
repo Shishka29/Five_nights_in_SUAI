@@ -23,16 +23,22 @@ public class GachaRoller : MonoBehaviour
     public AudioClip finalDropSound;
     public AudioClip noMoneySound;
 
-    [Header("Система игрока")]
-    public PlayerData player;
-
     [Header("Назад в меню")]
     public string menuSceneName = "MainMenu";
 
     private bool isRolling = false;   // ← Защита от повторных кликов
+    private PlayerData player;        // теперь автоматически получаем
 
     void Start()
     {
+        // Получаем PlayerData автоматически
+        player = PlayerData.Instance;
+        if (player == null)
+        {
+            Debug.LogError("PlayerData.Instance не найден!");
+            return;
+        }
+
         player.Load();
         UpdateUI();
     }
@@ -44,13 +50,15 @@ public class GachaRoller : MonoBehaviour
 
     public void Roll()
     {
+        if (player == null) return;
+
         // защита от повторного запуска
         if (isRolling)
             return;
 
         if (player.coins < rollPrice)
         {
-            if (noMoneySound != null)
+            if (noMoneySound != null && audioSource != null)
                 audioSource.PlayOneShot(noMoneySound);
             return;
         }
@@ -71,7 +79,7 @@ public class GachaRoller : MonoBehaviour
         {
             display.sprite = items[Random.Range(0, items.Length)].icon;
 
-            if (rollTickSound != null)
+            if (rollTickSound != null && audioSource != null)
                 audioSource.PlayOneShot(rollTickSound);
 
             timer += changeInterval;
@@ -82,7 +90,7 @@ public class GachaRoller : MonoBehaviour
         GachaItem final = GetItemByChance();
         display.sprite = final.icon;
 
-        if (finalDropSound != null)
+        if (finalDropSound != null && audioSource != null)
             audioSource.PlayOneShot(finalDropSound);
 
         player.AddItem(final.id);
@@ -108,6 +116,7 @@ public class GachaRoller : MonoBehaviour
 
     void UpdateUI()
     {
-        coinsText.text = player.coins.ToString();
+        if (coinsText != null && player != null)
+            coinsText.text = player.coins.ToString();
     }
 }

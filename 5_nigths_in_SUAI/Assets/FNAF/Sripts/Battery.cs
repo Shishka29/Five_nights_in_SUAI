@@ -37,10 +37,14 @@ public class Battery : MonoBehaviour
     private float currentCost;
     private int currentUsage;
 
+    public static Battery Instance; // ссылка на текущую батарею
+
     private void Awake()
     {
+        Instance = this; // сохраняем ссылку
         InvokeRepeating(nameof(ApplyBatteryDrain), 1f, 1f);
     }
+
 
     private void Update()
     {

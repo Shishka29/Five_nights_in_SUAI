@@ -4,8 +4,8 @@ public class ProgressManager : MonoBehaviour
 {
     public static ProgressManager Instance { get; private set; }
 
-    [Header("Progress")]
-    public int completedNight = 0; // Сколько ночей пройдено
+    public int completedNight = 0;   // текущая пройденная ночь
+    public int coins = 0;            // монетки игрока
 
     private void Awake()
     {
@@ -14,38 +14,34 @@ public class ProgressManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
-        LoadProgress(); // Загружаем прогресс при запуске
-    }
-
-    public void CompleteNight(int nightIndex)
-    {
-        if (completedNight < nightIndex)
-        {
-            completedNight = nightIndex;
-            SaveProgress();
-        }
-    }
-
-    public void UnlockNextNight()
-    {
-        completedNight++;
-        SaveProgress();
-    }
-
-    public void SaveProgress()
-    {
-        PlayerPrefs.SetInt("CompletedNight", completedNight);
-        PlayerPrefs.Save();
-        Debug.Log($"💾 Прогресс сохранён — пройдено ночей: {completedNight}");
     }
 
     public void LoadProgress()
     {
-        completedNight = PlayerPrefs.GetInt("CompletedNight", 0);
-        Debug.Log($"📂 Прогресс загружен — пройдено ночей: {completedNight}");
+        completedNight = PlayerPrefs.GetInt("completedNight", 0);
+        coins = PlayerPrefs.GetInt("coins", 0);
+    }
+
+    public void SaveProgress()
+    {
+        PlayerPrefs.SetInt("completedNight", completedNight);
+        PlayerPrefs.SetInt("coins", coins);
+        PlayerPrefs.Save();
+    }
+
+    public void ResetNights()
+    {
+        completedNight = 0;
+        SaveProgress(); // сохраняем сразу сброс
+    }
+
+    // Сохраняем монетки отдельно
+    public void AddCoins(int amount)
+    {
+        coins += amount;
+        PlayerPrefs.SetInt("coins", coins);
+        PlayerPrefs.Save();
     }
 }
