@@ -2,7 +2,8 @@
 using TMPro;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // для Image
+using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class NightRewardCounter : MonoBehaviour
 {
@@ -17,15 +18,19 @@ public class NightRewardCounter : MonoBehaviour
     public TMP_Text totalText;
 
     [Header("Animation Settings")]
-    public float countSpeed = 1.5f; // чем меньше — тем быстрее
+    public float countSpeed = 1.5f;
 
     [Header("Main Menu Settings")]
-    public string mainMenuScene = "MainMenu"; // имя сцены главного меню
-    public float delayBeforeMenu = 2f; // задержка перед переходом
+    public string mainMenuScene = "MainMenu";
+    public float delayBeforeMenu = 2f;
 
     [Header("Fade Settings")]
-    public Image fadeImage; // черный Image на весь экран
+    public Image fadeImage;
     public float fadeDuration = 1f;
+
+    [Header("Video Settings")]
+    public RawImage videoRawImage;
+    public VideoPlayer videoPlayer; // контролирует видео
 
     private int baseValue;
     private int energyValue;
@@ -34,9 +39,16 @@ public class NightRewardCounter : MonoBehaviour
     void Start()
     {
         if (fadeImage != null)
-            fadeImage.gameObject.SetActive(false); // прячем Image в начале
+            fadeImage.gameObject.SetActive(false);
 
         ReadValues();
+
+        if (videoPlayer != null)
+        {
+            videoPlayer.loopPointReached += OnVideoEnd; // событие конца видео
+            videoPlayer.Play();
+        }
+
         StartCoroutine(AnimateAll());
     }
 
@@ -54,15 +66,29 @@ public class NightRewardCounter : MonoBehaviour
         energyValue = pd.energyLeft;
         reflectValue = pd.reflectedAttacks;
 
-        // Сразу очищаем pendingReward и энергию/атаки, чтобы после начисления не дублировались
         pd.pendingReward = 0;
         pd.energyLeft = 0;
         pd.reflectedAttacks = 0;
         pd.Save();
     }
 
+    private bool videoEnded = false;
+
+    void OnVideoEnd(VideoPlayer vp)
+    {
+        videoEnded = true;
+
+        // Выключаем RawImage после окончания видео
+        if (videoRawImage != null)
+            videoRawImage.gameObject.SetActive(false);
+    }
+
     IEnumerator AnimateAll()
     {
+        // Ждём, пока видео не закончится
+        while (videoPlayer != null && !videoEnded)
+            yield return null;
+
         int baseCurrent = 0;
         int energyCurrent = 0;
         int reflectCurrent = 0;

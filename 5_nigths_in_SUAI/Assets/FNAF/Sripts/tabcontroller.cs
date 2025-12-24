@@ -61,7 +61,22 @@ public class tabcontroller : MonoBehaviour
 
     [Header("Room Sprites")]
     public Image roomDisplay;         
-    public Sprite[] roomSprites;      
+    public Sprite[] roomSprites;
+
+
+    [Header("⚡ Power Out Settings")]
+    public Light powerOutLight;
+
+    [Tooltip("Яркость света при отключении энергии")]
+    [Range(0f, 1f)]
+    public float powerOutIntensity = 0.2f;
+
+    public AudioSource powerOutAudioSource;
+    public AudioClip powerOutSound;
+
+    private bool powerOutTriggered = false;
+    private float originalIntensity;
+
 
     void Awake()
     {
@@ -70,16 +85,21 @@ public class tabcontroller : MonoBehaviour
         if (Tablet != null)
             anim = Tablet.GetComponent<Animator>();
 
+        if (powerOutLight != null)
+            originalIntensity = powerOutLight.intensity;
+
         TurnOffAllLightsInstant();
     }
-  
+
+
 
     void Update()
     {
-        if (energy.energy <= 0)
+        if (energy.energy <= 0 && !powerOutTriggered)
         {
-            Close();
+            OnPowerOut();
         }
+
         if (minimap != null && minimap.activeSelf)
         {
             if (camerasActive && cameraLights != null && currentCameraIndex < cameraLights.Length)
@@ -88,6 +108,46 @@ public class tabcontroller : MonoBehaviour
                 FadeOutAllLights();
         }
     }
+
+    void OnPowerOut()
+    {
+        powerOutTriggered = true;
+
+        Close();
+
+        // 🌗 ПЛАВНОЕ затухание света
+        if (powerOutLight != null)
+        {
+            StartCoroutine(FadeLightToPowerOut());
+        }
+
+        // 🔊 Звук отключения энергии
+        if (powerOutAudioSource != null && powerOutSound != null)
+        {
+            powerOutAudioSource.PlayOneShot(powerOutSound);
+        }
+    }
+
+
+    IEnumerator FadeLightToPowerOut()
+    {
+        float start = powerOutLight.intensity;
+        float target = originalIntensity * powerOutIntensity;
+        float t = 0f;
+        float duration = 1.5f;
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            powerOutLight.intensity = Mathf.Lerp(start, target, t / duration);
+            yield return null;
+        }
+
+        powerOutLight.intensity = target;
+    }
+
+
+
 
     void HandleCameraLights()
     {

@@ -30194,7 +30194,7 @@ MonoBehaviour:
   screamerModel: {fileID: 1188063827}
   screamerAnimator: {fileID: 1188063828}
   screamerAudioSource: {fileID: 952528913}
-  screamerSound: {fileID: 8300000, guid: 5d7887fee430bdb41941c97070d6cb7a, type: 3}
+  screamerSound: {fileID: 8300000, guid: bb7415ed4cadb2542a5b67b2766b9f5e, type: 3}
   screamerAnimationName: aksrun
   screamerDelay: 3
   gameOverDelay: 1.5
@@ -42618,7 +42618,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nightTimer: 0
-  nightLength: 5
+  nightLength: 540
   delayBeforeMenu: 1
   showDebugLogs: 1
   animatronicSettings:
@@ -48942,6 +48942,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 4ffff5569b66a1d4b857efc021dd75e1, type: 3}
   - {fileID: 21300000, guid: 1a3ccfc0602615b489e5eec5895a0f66, type: 3}
   - {fileID: 21300000, guid: 22d9ab6323d3c7b43808b2afb57e672b, type: 3}
+  powerOutLight: {fileID: 2081486276}
+  powerOutIntensity: 0.2
+  powerOutAudioSource: {fileID: 952528913}
+  powerOutSound: {fileID: 8300000, guid: f69ce0ffc711cdb4e890abb90b1dc7ab, type: 3}
 --- !u!114 &1861985352
 MonoBehaviour:
   m_ObjectHideFlags: 0
