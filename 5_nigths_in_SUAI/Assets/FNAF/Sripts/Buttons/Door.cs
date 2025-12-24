@@ -11,45 +11,71 @@ public class Door : MonoBehaviour
     public bool action = false;
     public Battery energy;
 
+    [Header("Sound")]
+    public AudioSource audioSource;
+    public AudioClip openSound;
+    public AudioClip closeSound;
+
+    private bool soundPlayed = false; // защита от повтора
+
     public void ButtonPressed()
     {
-        if (energy.energy > 0) 
+        if (energy.energy > 0)
         {
             isOpen = !isOpen;
             action = true;
+            PlayDoorSound();
         }
-        
     }
+
     public void ForceOpen()
     {
         isOpen = true;
         action = true;
+        PlayDoorSound();
     }
 
+    private void PlayDoorSound()
+    {
+        if (audioSource == null) return;
+
+        soundPlayed = false;
+
+        if (isOpen && openSound != null)
+            audioSource.PlayOneShot(openSound);
+        else if (!isOpen && closeSound != null)
+            audioSource.PlayOneShot(closeSound);
+
+        soundPlayed = true;
+    }
 
     private void Update()
     {
-        Vector3 NextPosition;
+        Vector3 nextPosition;
 
         if (energy.energy <= 0)
         {
-            isOpen = true;
-            action = true;
+            if (!isOpen)
+            {
+                isOpen = true;
+                action = true;
+                PlayDoorSound();
+            }
         }
-        if (isOpen)
-        {
-            NextPosition = openPosition;
-        }
-        else
-        {
-            NextPosition = closePosition;
-        }
+
+        nextPosition = isOpen ? openPosition : closePosition;
+
         if (action)
         {
-            transform.localPosition = Vector3.Lerp(transform.localPosition, NextPosition, 12f * Time.deltaTime);
-            if (Vector3.Distance(transform.localPosition, NextPosition) < 0.01f)
-{
-                transform.localPosition = NextPosition;
+            transform.localPosition = Vector3.Lerp(
+                transform.localPosition,
+                nextPosition,
+                12f * Time.deltaTime
+            );
+
+            if (Vector3.Distance(transform.localPosition, nextPosition) < 0.01f)
+            {
+                transform.localPosition = nextPosition;
                 action = false;
             }
         }
